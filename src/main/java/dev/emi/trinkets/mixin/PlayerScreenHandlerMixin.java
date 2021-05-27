@@ -4,12 +4,8 @@ import com.mojang.datafixers.util.Function3;
 import dev.emi.trinkets.TrinketPlayerScreenHandler;
 import dev.emi.trinkets.TrinketSlot;
 import dev.emi.trinkets.TrinketsClient;
-import dev.emi.trinkets.TrinketsMain;
-import dev.emi.trinkets.api.SlotGroup;
-import dev.emi.trinkets.api.SlotType;
+import dev.emi.trinkets.api.*;
 import dev.emi.trinkets.api.Trinket.SlotReference;
-import dev.emi.trinkets.api.TrinketInventory;
-import dev.emi.trinkets.api.TrinketsApi;
 import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -63,13 +59,13 @@ public abstract class PlayerScreenHandlerMixin extends ScreenHandler implements 
 	@Inject(at = @At("RETURN"), method = "<init>")
 	public void init(PlayerInventory playerInv, boolean onServer, PlayerEntity owner, CallbackInfo info) {
 		this.inventory = playerInv;
-		updateTrinketSlots();
+		updateTrinketSlots(true);
 	}
 
 	@Override
-	public void updateTrinketSlots() {
+	public void updateTrinketSlots(boolean slotsChanged) {
 		TrinketsApi.getTrinketComponent(owner).ifPresent(trinkets -> {
-			trinkets.update();
+			if (slotsChanged) trinkets.update();
 			Map<String, SlotGroup> groups = trinkets.getGroups();
 			groupPos.clear();
 			while (trinketSlotStart < trinketSlotEnd) {
